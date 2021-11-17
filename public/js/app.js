@@ -2852,7 +2852,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Modal_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../../components/Modal.vue */ "./resources/js/components/Modal.vue");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
 /* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var _components_CustomBtn_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/CustomBtn.vue */ "./resources/js/components/CustomBtn.vue");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -3015,6 +3016,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+
 
 
 
@@ -3024,19 +3028,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   components: {
     CustomForm: _components_CustomForm_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
     FormInput: _components_FormInput_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    Modal: _components_Modal_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    Modal: _components_Modal_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+    CustomBtn: _components_CustomBtn_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
   },
   data: function data() {
     return {
       item: {},
       loader: true,
       isClosed: false,
+      stopBtnLoading: false,
       autoBidObj: {},
       autoBidBtn: false,
       autoBiddingModal: false
     };
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["isLoggedIn"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["isLoggedIn"])), {}, {
     id: function id() {
       return this.$route.params.id;
     }
@@ -3134,28 +3140,38 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         timer: 300000
       });
     },
-    autoBid: function autoBid() {
+    autoBid: function autoBid(_ref2) {
+      var data = _ref2.data;
+      this.item = data;
       this.autoBiddingModal = false;
     },
     stopAutoBidding: function stopAutoBidding() {
-      this.axios["delete"]("/api/auto-bid/".concat(this.id)).then(function () {});
+      var _this2 = this;
+
+      this.stopBtnLoading = true;
+      this.axios["delete"]("/api/auto-bid/".concat(this.id)).then(function (_ref3) {
+        var data = _ref3.data;
+        _this2.item = data;
+      })["finally"](function () {
+        return _this2.stopBtnLoading = false;
+      });
     }
   },
   created: function created() {
     this.getItmeData();
   },
   mounted: function mounted() {
-    var _this2 = this;
+    var _this3 = this;
 
     setInterval(function () {
-      _this2.$forceUpdate(function () {
-        return _this2.formatDataTime();
+      _this3.$forceUpdate(function () {
+        return _this3.formatDataTime();
       });
     }, 1000);
     this.$echo.channel("update-item").listen("ItemEvent", function (payload) {
-      _this2.item = payload.item;
+      _this3.item = payload.item;
 
-      _this2.$emit("clear-errors");
+      _this3.$emit("clear-errors");
 
       console.log("update-item.");
       console.log(payload);
@@ -34748,22 +34764,35 @@ var render = function () {
                             _vm._v(" "),
                             _c("div", [
                               _vm.item.hasAutoBid
-                                ? _c("label", [
-                                    _vm._v(
-                                      "\n                auto bidding has activated\n                "
-                                    ),
-                                    _c(
-                                      "span",
-                                      {
-                                        staticClass:
-                                          "underline text-purple-600 cursor-pointer",
-                                        on: { click: _vm.stopAutoBidding },
-                                      },
-                                      [_vm._v("Stop it")]
-                                    ),
-                                  ])
+                                ? _c(
+                                    "div",
+                                    { staticClass: "flex" },
+                                    [
+                                      _vm._v(
+                                        "\n                auto bidding has activated\n                "
+                                      ),
+                                      _c("Custom-btn", {
+                                        staticClass: "flex ml-2",
+                                        attrs: {
+                                          text: "Stop it",
+                                          loading: _vm.stopBtnLoading,
+                                          cssClass:
+                                            "underline text-purple-600 cursor-pointer",
+                                        },
+                                        nativeOn: {
+                                          click: function ($event) {
+                                            return _vm.stopAutoBidding.apply(
+                                              null,
+                                              arguments
+                                            )
+                                          },
+                                        },
+                                      }),
+                                    ],
+                                    1
+                                  )
                                 : _c(
-                                    "label",
+                                    "span",
                                     {
                                       staticClass: "cursor-pointer",
                                       on: {

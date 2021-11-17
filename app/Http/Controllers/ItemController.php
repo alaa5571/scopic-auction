@@ -30,13 +30,11 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        $itemWithBids = Item::with('autoBids')->find($item->id);
-        if ($itemWithBids->autoBids->count() > 0) {
+        $itemWithBids = Item::hasAutoBid($item);
+        $auto_bids = $itemWithBids->autoBids;
+        if ($auto_bids->count() > 0) {
             $item->hasAutoBid = true;
-        } else {
-            $item->hasAutoBid = false;
         }
-
         return $item;
     }
 
@@ -80,7 +78,6 @@ class ItemController extends Controller
                     $item->user_id = Auth::id();
                 }
 
-                // $item->max_bid = $request->max_bid;
                 $item->save();
                 return event(new ItemEvent($item));
             } else {
@@ -107,9 +104,9 @@ class ItemController extends Controller
             $auto_bid->user_id = Auth::id();
             $auto_bid->save();
             $item->hasAutoBid = true;
-            return event(new ItemEvent($item));
+            return $item;
         } else {
-            return 'no';
+            return response()->json(['message' => "You Can't make auto bid on this item"], 422);
         }
     }
 }
