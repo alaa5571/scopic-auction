@@ -61,21 +61,23 @@
                 </template>
               </CustomForm>
               <div>
-                <label v-if="item.hasAutoBid">
+                <div class="flex" v-if="item.hasAutoBid">
                   auto bidding has activated
-                  <span
-                    @click="stopAutoBidding"
-                    class="underline text-purple-600 cursor-pointer"
-                    >Stop it</span
-                  >
-                </label>
-                <label
+                  <Custom-btn
+                    class="flex ml-2"
+                    text="Stop it"
+                    :loading="stopBtnLoading"
+                    @click.native="stopAutoBidding"
+                    cssClass="underline text-purple-600 cursor-pointer"
+                  />
+                </div>
+                <span
                   v-else
-                  @click="autoBiddingModal = true"
                   class="cursor-pointer"
+                  @click="autoBiddingModal = true"
                 >
                   Activate the <span class="underline">auto bidding</span>
-                </label>
+                </span>
               </div>
             </div>
             <div v-else-if="isLoggedIn && isClosed">
@@ -160,15 +162,17 @@ import FormInput from "./../../components/FormInput.vue";
 import Modal from "./../../components/Modal.vue";
 import moment, { now } from "moment";
 import { mapGetters } from "vuex";
+import CustomBtn from "../../components/CustomBtn.vue";
 
 export default {
-  components: { CustomForm, FormInput, Modal },
+  components: { CustomForm, FormInput, Modal, CustomBtn },
   data() {
     return {
       item: {},
       loader: true,
 
       isClosed: false,
+      stopBtnLoading: false,
 
       autoBidObj: {},
       autoBidBtn: false,
@@ -271,18 +275,26 @@ export default {
         timer: 300000,
       });
     },
-    autoBid() {
+    autoBid({ data }) {
+      this.item = data;
       this.autoBiddingModal = false;
     },
 
     stopAutoBidding() {
-      this.axios.delete(`/api/auto-bid/${this.id}`).then(() => {});
+      this.stopBtnLoading = true;
+      this.axios
+        .delete(`/api/auto-bid/${this.id}`)
+        .then(({ data }) => {
+          this.item = data;
+        })
+        .finally(() => (this.stopBtnLoading = false));
     },
   },
 
   created() {
     this.getItmeData();
   },
+
   mounted() {
     setInterval(() => {
       this.$forceUpdate(() => this.formatDataTime());
