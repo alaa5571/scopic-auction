@@ -1,0 +1,299 @@
+<template>
+  <div>
+    <Loader v-if="loader" />
+    <div v-else class="screen-width">
+      <div class="flex flex-wrap">
+        <div class="w-full md:w-3/5 lg:w-2/3">
+          <div
+            class="
+              h-64
+              w-full
+              bg-cover
+              rounded-md
+              md:h-screen
+              2xl:bg-contain
+              lg:bg-top lg:h-full
+              bg-no-repeat bg-center
+            "
+            style="
+              background: url(https://www.benfrancia.com/wp-content/themes/carbonate-master/images/no-image.svg);
+            "
+          ></div>
+        </div>
+        <div class="w-full md:w-2/5 lg:w-1/3 px-6 py-10">
+          <h3 class="font-bold mb-2">{{ item.name }}</h3>
+          <span class="block mb-4">Minimun bid {{ item.min_bid }}$</span>
+          <p class="mb-6 font-thin leading-relaxed text-sm">
+            <span class="block font-semibold">Details</span>
+            {{ item.details }}
+          </p>
+
+          <div class="flex justify-between mb-6">
+            <div>
+              <span class="block">Last bid Made</span>
+              <span class="block font-semibold"> {{ item.max_bid }}$ </span>
+            </div>
+            <div>
+              <span class="block">Available Untill</span>
+              <span class="block font-semibold">{{ formatDataTime() }}</span>
+            </div>
+          </div>
+
+          <!-- bid now -->
+          <div>
+            <div v-if="isLoggedIn && !isClosed">
+              <CustomForm
+                requestType="put"
+                @success="bidNow"
+                :url="`/api/items/${id}`"
+                saveBtnText="Place A bid"
+                saveBtnClass="w-full btn btn-primary mb-2"
+              >
+                <template #content="{ fields }">
+                  <FormInput
+                    isRequired
+                    iconText="$"
+                    type="number"
+                    v-model="fields.max_bid"
+                    :bindOptions="{ min: +item.max_bid + 1 }"
+                    :placeholder="`Bid Now with more than ${item.max_bid}$`"
+                  />
+                </template>
+              </CustomForm>
+              <div>
+                <label v-if="item.hasAutoBid">
+                  auto bidding has activated
+                  <span
+                    @click="stopAutoBidding"
+                    class="underline text-purple-600 cursor-pointer"
+                    >Stop it</span
+                  >
+                </label>
+                <label
+                  v-else
+                  @click="autoBiddingModal = true"
+                  class="cursor-pointer"
+                >
+                  Activate the <span class="underline">auto bidding</span>
+                </label>
+              </div>
+            </div>
+            <div v-else-if="isLoggedIn && isClosed">
+              <div
+                class="
+                  p-4
+                  bg-orange-100
+                  text-orange-700
+                  border-l-4 border-orange-500
+                "
+              >
+                <p class="font-bold">Be Warned</p>
+                <p>This Item is closed, so you can't bid on it.</p>
+              </div>
+            </div>
+            <div v-else>
+              <div
+                class="
+                  p-4
+                  bg-orange-100
+                  text-orange-700
+                  border-l-4 border-orange-500
+                "
+              >
+                <p class="font-bold">Be Warned</p>
+                <p>
+                  You have to
+                  <router-link to="/login" class="font-bold">login</router-link>
+                  first to be able to make a bid
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- auto bidding modal -->
+          <Modal v-if="autoBiddingModal" @close="autoBiddingModal = false">
+            <template #content>
+              <div class="mb-6 border-b pb-2">
+                <h3 class="font-bold text-center text-gray-800">
+                  Configure The Auto-Bidding
+                </h3>
+              </div>
+              <CustomForm
+                @success="autoBid"
+                :url="`/api/items/${id}/auto-bid`"
+                saveBtnText="Place Auto bid"
+                saveBtnClass="w-full btn btn-primary mb-2"
+              >
+                <template #content="{ fields }">
+                  <FormInput
+                    isRequired
+                    iconText="$"
+                    class="mb-4"
+                    type="number"
+                    label="Maximun Bid Amount"
+                    v-model="fields.max_auto_bid"
+                    placeholder="Maximun Bid Amount"
+                    :bindOptions="{ min: +item.max_bid + 1 }"
+                  />
+                  <!-- <FormInput
+                    iconText="%"
+                    class="mb-4"
+                    type="number"
+                    :bindOptions="{ max: 100 }"
+                    v-model="autoBidObj.alertWhen"
+                    label="Bid Alert Notification"
+                    placeholder="Bid Alert Notification"
+                  /> -->
+                </template>
+              </CustomForm>
+            </template>
+          </Modal>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import CustomForm from "./../../components/CustomForm.vue";
+import FormInput from "./../../components/FormInput.vue";
+import Modal from "./../../components/Modal.vue";
+import moment, { now } from "moment";
+import { mapGetters } from "vuex";
+
+export default {
+  components: { CustomForm, FormInput, Modal },
+  data() {
+    return {
+      item: {},
+      loader: true,
+
+      isClosed: false,
+
+      autoBidObj: {},
+      autoBidBtn: false,
+      autoBiddingModal: false,
+    };
+  },
+
+  computed: {
+    ...mapGetters(["isLoggedIn"]),
+    id() {
+      return this.$route.params.id;
+    },
+  },
+
+  methods: {
+    getItmeData() {
+      this.axios.get(`/api/items/${this.id}`).then(({ data }) => {
+        this.item = data;
+        this.loader = false;
+      });
+    },
+    formatDataTime() {
+      let atThisMoment = moment(now());
+      let until = moment(this.item.available_untill);
+      if (atThisMoment.isBefore(until)) {
+        let { _data } = moment.duration(until.diff(atThisMoment));
+        let time = "";
+
+        //years Format
+        if (_data.years) {
+          if (_data.years != 1) {
+            time += `${_data.years} Years, `;
+          } else {
+            time += `a Year, `;
+          }
+        }
+
+        //months Format
+        if (_data.months) {
+          if (_data.months != 1) {
+            time += `${_data.months} months, `;
+          } else {
+            time += `a Month, `;
+          }
+        }
+
+        //years Format
+        if (_data.days) {
+          if (_data.days != 1) {
+            time += `${_data.days} Days, `;
+          } else {
+            time += `a Day, `;
+          }
+        }
+
+        //hours Format
+        if (_data.hours) {
+          if (_data.hours < 10) {
+            time += `0${_data.hours}:`;
+          } else {
+            time += `${_data.hours}:`;
+          }
+        } else {
+          time += `00:`;
+        }
+
+        //minutes Format
+        if (_data.minutes) {
+          if (_data.minutes < 10) {
+            time += `0${_data.minutes}:`;
+          } else {
+            time += `${_data.minutes}:`;
+          }
+        } else {
+          time += `00:`;
+        }
+
+        //seconds Format
+        if (_data.seconds) {
+          if (_data.seconds < 10) {
+            time += `0${_data.seconds}`;
+          } else {
+            time += `${_data.seconds}`;
+          }
+        } else {
+          time += `00`;
+        }
+
+        return time;
+      } else {
+        this.isClosed = true;
+        return "This bidding is closed";
+      }
+    },
+    bidNow() {
+      this.$fire({
+        title: "Success Bid",
+        text: "You have the maximum bid now, wait till win!",
+        type: "success",
+        timer: 300000,
+      });
+    },
+    autoBid() {
+      this.autoBiddingModal = false;
+    },
+
+    stopAutoBidding() {
+      this.axios.delete(`/api/auto-bid/${this.id}`).then(() => {});
+    },
+  },
+
+  created() {
+    this.getItmeData();
+  },
+  mounted() {
+    setInterval(() => {
+      this.$forceUpdate(() => this.formatDataTime());
+    }, 1000);
+
+    this.$echo.channel("update-item").listen("ItemEvent", (payload) => {
+      this.item = payload.item;
+      this.$emit("clear-errors");
+      console.log("update-item.");
+      console.log(payload);
+    });
+  },
+};
+</script>
