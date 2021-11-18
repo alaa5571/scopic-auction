@@ -48,9 +48,10 @@
           <span
             @click="$emit('close')"
             class="
+              m-1
               px-2
               py-1
-              rounded-bl
+              rounded
               float-right
               cursor-pointer
               bg-purple-600

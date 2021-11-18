@@ -11,9 +11,7 @@
           <div class="bg w-full h-64 flex justify-center">
             <div
               class="w-full h-full bg-cover bg-no-repeat bg-center"
-              style="
-                background: url(https://www.benfrancia.com/wp-content/themes/carbonate-master/images/no-image.svg);
-              "
+              style="background: url(/assets/images/cover.png)"
             ></div>
           </div>
           <div class="p-2">

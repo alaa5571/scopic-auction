@@ -34,6 +34,7 @@ class ItemController extends Controller
         $auto_bids = $itemWithBids->autoBids;
         if ($auto_bids->count() > 0) {
             $item->hasAutoBid = true;
+            $item->max_auto_bid = $auto_bids[0]->max_auto_bid;
         }
         return $item;
     }
@@ -58,12 +59,13 @@ class ItemController extends Controller
         if ($item->available_untill && now() < $item->available_untill) {
             if ($item->user_id !== Auth::id()) {
                 // put auto biiding
-                $itemWithBids = Item::with('autoBids')->find($item->id);
+                $itemWithBids = Item::hasAutoBid($item);
                 $autoBids =  $itemWithBids->autoBids->sortBy('max_auto_bid')->pluck('max_auto_bid');
 
                 $autoBidsCount = $autoBids->count();
 
                 if ($autoBids && $autoBidsCount === 1 && $request->max_bid < $autoBids[0]) {
+                    return $autoBids[0];
                     $item->max_bid = $request->max_bid + 1;
                 } else if ($autoBids && $autoBidsCount > 1 && $request->max_bid < $autoBids[$autoBidsCount - 1]) {
                     $autoBidBrforeLast = $autoBids[$autoBidsCount - 2];
@@ -103,7 +105,9 @@ class ItemController extends Controller
             $auto_bid->item_id = $item->id;
             $auto_bid->user_id = Auth::id();
             $auto_bid->save();
+
             $item->hasAutoBid = true;
+            $item->max_auto_bid = $auto_bid->max_auto_bid;
             return $item;
         } else {
             return response()->json(['message' => "You Can't make auto bid on this item"], 422);
