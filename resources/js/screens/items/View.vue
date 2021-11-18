@@ -15,9 +15,7 @@
               lg:bg-top lg:h-full
               bg-no-repeat bg-center
             "
-            style="
-              background: url(https://www.benfrancia.com/wp-content/themes/carbonate-master/images/no-image.svg);
-            "
+            style="background: url(/assets/images/cover.png)"
           ></div>
         </div>
         <div class="w-full md:w-2/5 lg:w-1/3 px-6 py-10">
@@ -42,42 +40,49 @@
           <!-- bid now -->
           <div>
             <div v-if="isLoggedIn && !isClosed">
-              <CustomForm
-                requestType="put"
-                @success="bidNow"
-                :url="`/api/items/${id}`"
-                saveBtnText="Place A bid"
-                saveBtnClass="w-full btn btn-primary mb-2"
-              >
-                <template #content="{ fields }">
-                  <FormInput
-                    isRequired
-                    iconText="$"
-                    type="number"
-                    v-model="fields.max_bid"
-                    :bindOptions="{ min: +item.max_bid + 1 }"
-                    :placeholder="`Bid Now with more than ${item.max_bid}$`"
-                  />
-                </template>
-              </CustomForm>
-              <div>
-                <div class="flex" v-if="item.hasAutoBid">
-                  auto bidding has activated
-                  <Custom-btn
-                    class="flex ml-2"
-                    text="Stop it"
-                    :loading="stopBtnLoading"
-                    @click.native="stopAutoBidding"
-                    cssClass="underline text-purple-600 cursor-pointer"
-                  />
-                </div>
-                <span
-                  v-else
-                  class="cursor-pointer"
-                  @click="autoBiddingModal = true"
+              <div v-if="!item.hasAutoBid">
+                <CustomForm
+                  requestType="put"
+                  @success="bidNow"
+                  :url="`/api/items/${id}`"
+                  saveBtnText="Place A bid"
+                  saveBtnClass="w-full btn btn-primary mb-2"
                 >
+                  <template #content="{ fields }">
+                    <FormInput
+                      isRequired
+                      iconText="$"
+                      type="number"
+                      v-model="fields.max_bid"
+                      :bindOptions="{ min: +item.max_bid + 1 }"
+                      :placeholder="`Bid Now with more than ${item.max_bid}$`"
+                    />
+                  </template>
+                </CustomForm>
+                <span class="cursor-pointer" @click="autoBiddingModal = true">
                   Activate the <span class="underline">auto bidding</span>
                 </span>
+              </div>
+              <div v-else>
+                <div v-if="item.hasAutoBid">
+                  <div
+                    class="
+                      p-4
+                      w-full
+                      bg-green-100
+                      text-green-700
+                      border-l-4 border-green-500
+                    "
+                  >
+                    auto bidding has activated {{ item.max_auto_bid }}$
+                    <Custom-btn
+                      text="Stop it"
+                      :loading="stopBtnLoading"
+                      @click.native="stopAutoBidding"
+                      cssClass="underline text-green-900 cursor-pointer font-semibold"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div v-else-if="isLoggedIn && isClosed">
@@ -268,12 +273,12 @@ export default {
       }
     },
     bidNow() {
-      this.$fire({
-        title: "Success Bid",
-        text: "You have the maximum bid now, wait till win!",
-        type: "success",
-        timer: 300000,
-      });
+      // this.$fire({
+      //   title: "Success Bid",
+      //   text: "You have the maximum bid now, wait till win!",
+      //   type: "success",
+      //   timer: 300000,
+      // });
     },
     autoBid({ data }) {
       this.item = data;
@@ -300,11 +305,11 @@ export default {
       this.$forceUpdate(() => this.formatDataTime());
     }, 1000);
 
-    this.$echo.channel("update-item").listen("ItemEvent", (payload) => {
-      this.item = payload.item;
-      this.$emit("clear-errors");
-      console.log("update-item.");
-      console.log(payload);
+    this.$echo.channel("update-item").listen("ItemEvent", ({ item }) => {
+      if (this.id == item.id) {
+        this.item = item;
+        this.$emit("clear-errors");
+      }
     });
   },
 };
