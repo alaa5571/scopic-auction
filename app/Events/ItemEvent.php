@@ -34,6 +34,7 @@ class ItemEvent implements ShouldBroadcast
 
     public function broadcastWith()
     {
+
         return ['item' => $this->item];
     }
 

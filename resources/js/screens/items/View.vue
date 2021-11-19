@@ -133,7 +133,6 @@
               >
                 <template #content="{ fields }">
                   <FormInput
-                    isRequired
                     iconText="$"
                     class="mb-4"
                     type="number"
@@ -142,15 +141,14 @@
                     placeholder="Maximun Bid Amount"
                     :bindOptions="{ min: +item.max_bid + 1 }"
                   />
-                  <!-- <FormInput
+                  <FormInput
                     iconText="%"
                     class="mb-4"
                     type="number"
-                    :bindOptions="{ max: 100 }"
-                    v-model="autoBidObj.alertWhen"
+                    v-model="fields.alert_when"
                     label="Bid Alert Notification"
                     placeholder="Bid Alert Notification"
-                  /> -->
+                  />
                 </template>
               </CustomForm>
             </template>
@@ -181,6 +179,7 @@ export default {
 
       autoBidObj: {},
       autoBidBtn: false,
+      hasAutoBid: false,
       autoBiddingModal: false,
     };
   },
@@ -305,11 +304,19 @@ export default {
       this.$forceUpdate(() => this.formatDataTime());
     }, 1000);
 
+    this.$echo
+      .private(`item-has-bid-${this.$store.state.user.id}`)
+      .listen("ItemWithBidsEvent", ({ itemWithBid }) => {
+        this.hasAutoBid = true;
+        this.item = itemWithBid;
+      });
+
     this.$echo.channel("update-item").listen("ItemEvent", ({ item }) => {
-      if (this.id == item.id) {
+      if (this.id == item.id && !this.hasAutoBid) {
         this.item = item;
         this.$emit("clear-errors");
       }
+      this.$nextTick(() => (this.hasAutoBid = false));
     });
   },
 };

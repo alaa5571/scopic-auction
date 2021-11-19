@@ -14,11 +14,4 @@ class Item extends Model
     {
         return $this->hasMany('App\Models\AutoBid');
     }
-
-    public function scopeHasAutoBid($query, $item)
-    {
-        return $query->with(['autoBids' => function ($query) use ($item) {
-            $query->where('user_id', Auth::id())->where('item_id', $item->id);
-        }])->find($item->id);
-    }
 }
