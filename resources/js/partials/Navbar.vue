@@ -115,11 +115,53 @@ export default {
     logout() {
       this.$store.dispatch("logout");
     },
+    test() {
+      console.log("hho");
+    },
   },
   watch: {
     $route() {
       this.showProfileMenu = false;
     },
+  },
+
+  mounted() {
+    this.$echo
+      .private(`notify-with-bid-${this.$store.state.user.id}`)
+      .listen("AutoBidEvent", ({ autoBid, message }) => {
+        console.log(autoBid);
+
+        let msg, type, title;
+        if (message == "canceled") {
+          type = "error";
+          title = "Bid Has Canceled";
+          msg = `Your bid on <span id="alert-user" class="font-bold text-red-400">
+                         this item ( ${autoBid.item.name} )
+                      </span> 
+                      has closed because you don't have enough balance <br />.
+                      Do you still want to make a bid?`;
+        } else {
+          type = "warning";
+          title = "Bid Reached Maximum Value";
+          msg = `Your bid on <span id="alert-user" class="font-bold text-orange-400">
+                         this item ( ${autoBid.item.name} )
+                      </span> 
+                      has reached the maximum value that reserved <br />.
+                      Do you want to visit it?`;
+        }
+        this.$fire({
+          title: title,
+          html: msg,
+          type: type,
+          timer: 30000,
+          showCloseButton: true,
+          showCancelButton: true,
+        }).then(() => {
+          if (this.$route.path != `/items/${autoBid.item_id}`) {
+            this.$router.push(`/items/${autoBid.item_id}`);
+          }
+        });
+      });
   },
 };
 </script>

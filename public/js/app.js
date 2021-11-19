@@ -2379,6 +2379,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     type: {
@@ -2386,7 +2391,7 @@ __webpack_require__.r(__webpack_exports__);
       required: true
     },
     label: String,
-    value: String,
+    value: [String, Number],
     iconText: String,
     placeholder: String,
     bindOptions: Object,
@@ -2663,12 +2668,48 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   methods: {
     logout: function logout() {
       this.$store.dispatch("logout");
+    },
+    test: function test() {
+      console.log("hho");
     }
   },
   watch: {
     $route: function $route() {
       this.showProfileMenu = false;
     }
+  },
+  mounted: function mounted() {
+    var _this = this;
+
+    this.$echo["private"]("notify-with-bid-".concat(this.$store.state.user.id)).listen("AutoBidEvent", function (_ref) {
+      var autoBid = _ref.autoBid,
+          message = _ref.message;
+      console.log(autoBid);
+      var msg, type, title;
+
+      if (message == "canceled") {
+        type = "error";
+        title = "Bid Has Canceled";
+        msg = "Your bid on <span id=\"alert-user\" class=\"font-bold text-red-400\">\n                         this item ( ".concat(autoBid.item.name, " )\n                      </span> \n                      has closed because you don't have enough balance <br />.\n                      Do you still want to make a bid?");
+      } else {
+        type = "warning";
+        title = "Bid Reached Maximum Value";
+        msg = "Your bid on <span id=\"alert-user\" class=\"font-bold text-orange-400\">\n                         this item ( ".concat(autoBid.item.name, " )\n                      </span> \n                      has reached the maximum value that reserved <br />.\n                      Do you want to visit it?");
+      }
+
+      _this.$fire({
+        title: title,
+        html: msg,
+        type: type,
+        timer: 30000,
+        showCloseButton: true,
+        showCancelButton: true
+      }).then(function () {
+        if (_this.$route.path != "/items/".concat(autoBid.item_id)) {
+          _this.$router.push("/items/".concat(autoBid.item_id));
+        }
+      });
+    });
   }
 });
 
@@ -3011,8 +3052,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
 
 
 
@@ -3034,6 +3073,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       stopBtnLoading: false,
       autoBidObj: {},
       autoBidBtn: false,
+      hasAutoBid: false,
       autoBiddingModal: false
     };
   },
@@ -3162,14 +3202,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return _this3.formatDataTime();
       });
     }, 1000);
-    this.$echo.channel("update-item").listen("ItemEvent", function (_ref4) {
-      var item = _ref4.item;
+    this.$echo["private"]("item-has-bid-".concat(this.$store.state.user.id)).listen("ItemWithBidsEvent", function (_ref4) {
+      var itemWithBid = _ref4.itemWithBid;
+      _this3.hasAutoBid = true;
+      _this3.item = itemWithBid;
+    });
+    this.$echo.channel("update-item").listen("ItemEvent", function (_ref5) {
+      var item = _ref5.item;
 
-      if (_this3.id == item.id) {
+      if (_this3.id == item.id && !_this3.hasAutoBid) {
         _this3.item = item;
 
         _this3.$emit("clear-errors");
       }
+
+      _this3.$nextTick(function () {
+        return _this3.hasAutoBid = false;
+      });
     });
   }
 });
@@ -3216,7 +3265,13 @@ vue__WEBPACK_IMPORTED_MODULE_6__["default"].use((vue_echo_laravel__WEBPACK_IMPOR
   broadcaster: "pusher",
   key: "c9f47df528464ea65c82",
   cluster: "ap3",
-  forceTLS: false
+  forceTLS: false,
+  encrypted: true,
+  auth: {
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token") || 0
+    }
+  }
 });
 new vue__WEBPACK_IMPORTED_MODULE_6__["default"]({
   store: _store__WEBPACK_IMPORTED_MODULE_1__["default"],
@@ -34085,7 +34140,12 @@ var render = function () {
                 domProps: { value: _vm.value },
                 on: {
                   input: function ($event) {
-                    return _vm.$emit("input", $event.target.value)
+                    return _vm.$emit(
+                      "input",
+                      _vm.type === "number"
+                        ? +$event.target.value
+                        : $event.target.value
+                    )
                   },
                 },
               },
@@ -34913,7 +34973,6 @@ var render = function () {
                                               _c("FormInput", {
                                                 staticClass: "mb-4",
                                                 attrs: {
-                                                  isRequired: "",
                                                   iconText: "$",
                                                   type: "number",
                                                   label: "Maximun Bid Amount",
@@ -34936,13 +34995,37 @@ var render = function () {
                                                     "fields.max_auto_bid",
                                                 },
                                               }),
+                                              _vm._v(" "),
+                                              _c("FormInput", {
+                                                staticClass: "mb-4",
+                                                attrs: {
+                                                  iconText: "%",
+                                                  type: "number",
+                                                  label:
+                                                    "Bid Alert Notification",
+                                                  placeholder:
+                                                    "Bid Alert Notification",
+                                                },
+                                                model: {
+                                                  value: fields.alert_when,
+                                                  callback: function ($$v) {
+                                                    _vm.$set(
+                                                      fields,
+                                                      "alert_when",
+                                                      $$v
+                                                    )
+                                                  },
+                                                  expression:
+                                                    "fields.alert_when",
+                                                },
+                                              }),
                                             ]
                                           },
                                         },
                                       ],
                                       null,
                                       false,
-                                      377292595
+                                      2192740384
                                     ),
                                   }),
                                 ]
@@ -34952,7 +35035,7 @@ var render = function () {
                           ],
                           null,
                           false,
-                          4205068736
+                          1039178404
                         ),
                       })
                     : _vm._e(),

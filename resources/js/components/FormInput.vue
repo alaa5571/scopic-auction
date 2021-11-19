@@ -31,7 +31,12 @@
         :value="value"
         v-bind="bindOptions"
         :required="isRequired"
-        @input="$emit('input', $event.target.value)"
+        @input="
+          $emit(
+            'input',
+            type === 'number' ? +$event.target.value : $event.target.value
+          )
+        "
         :placeholder="placeholder"
         class="
           px-2
@@ -61,7 +66,7 @@ export default {
       required: true,
     },
     label: String,
-    value: String,
+    value: [String, Number],
     iconText: String,
     placeholder: String,
     bindOptions: Object,

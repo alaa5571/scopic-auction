@@ -18,6 +18,7 @@ class CreateAutoBidsTable extends Migration
             $table->integer('max_auto_bid');
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('item_id')->unsigned();
+            $table->integer('alert_when')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('item_id')->references('id')->on('items')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();

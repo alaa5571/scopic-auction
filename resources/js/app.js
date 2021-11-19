@@ -22,6 +22,12 @@ Vue.use(VueEcho, {
     key: "c9f47df528464ea65c82",
     cluster: "ap3",
     forceTLS: false,
+    encrypted: true,
+    auth: {
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("token") || null,
+        },
+    },
 });
 
 new Vue({

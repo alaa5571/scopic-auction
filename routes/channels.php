@@ -14,6 +14,14 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+Broadcast::channel('item-has-bid-{user_id}', function ($user) {
+    return true;
+});
+
+Broadcast::channel('notify-with-bid-{user_id}', function ($user) {
+    return true;
+});
+
 
 Broadcast::channel('update-item', function ($user) {
     return true;
