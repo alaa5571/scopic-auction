@@ -3,11 +3,7 @@
 namespace App\Events;
 
 use \App\Models\Item;
-use \App\Models\AutoBid;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -63,6 +59,7 @@ class ItemWithBidsEvent implements ShouldBroadcast
         $itemWithBids = Item::with(['autoBids' => function ($query) use ($item) {
             $query->where('item_id', $item->id)->where('max_auto_bid', '>', $item->max_bid);
         }])->find($item->id);
+
         return $itemWithBids->autoBids;
     }
 }

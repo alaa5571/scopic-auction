@@ -2391,11 +2391,11 @@ __webpack_require__.r(__webpack_exports__);
       required: true
     },
     label: String,
-    value: [String, Number],
     iconText: String,
     placeholder: String,
     bindOptions: Object,
-    isRequired: Boolean
+    isRequired: Boolean,
+    value: [String, Number]
   },
   computed: {
     id: function id() {
@@ -2668,9 +2668,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   methods: {
     logout: function logout() {
       this.$store.dispatch("logout");
-    },
-    test: function test() {
-      console.log("hho");
     }
   },
   watch: {
@@ -2684,13 +2681,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.$echo["private"]("notify-with-bid-".concat(this.$store.state.user.id)).listen("AutoBidEvent", function (_ref) {
       var autoBid = _ref.autoBid,
           message = _ref.message;
-      console.log(autoBid);
       var msg, type, title;
 
       if (message == "canceled") {
         type = "error";
         title = "Bid Has Canceled";
-        msg = "Your bid on <span id=\"alert-user\" class=\"font-bold text-red-400\">\n                         this item ( ".concat(autoBid.item.name, " )\n                      </span> \n                      has closed because you don't have enough balance <br />.\n                      Do you still want to make a bid?");
+        msg = "Your bid on <span id=\"alert-user\" class=\"font-bold text-red-400\">\n                         this item ( ".concat(autoBid.item.name, " )\n                      </span> \n                      has closed because you don't have enough balance <br />.\n                      Do you want to visit it?");
       } else {
         type = "warning";
         title = "Bid Reached Maximum Value";
@@ -2878,19 +2874,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _components_CustomForm_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../../components/CustomForm.vue */ "./resources/js/components/CustomForm.vue");
-/* harmony import */ var _components_FormInput_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../../components/FormInput.vue */ "./resources/js/components/FormInput.vue");
-/* harmony import */ var _components_Modal_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./../../components/Modal.vue */ "./resources/js/components/Modal.vue");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _components_CustomBtn_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/CustomBtn.vue */ "./resources/js/components/CustomBtn.vue");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _components_Modal_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./../../components/Modal.vue */ "./resources/js/components/Modal.vue");
+/* harmony import */ var _components_CustomBtn_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/CustomBtn.vue */ "./resources/js/components/CustomBtn.vue");
+/* harmony import */ var _components_FormInput_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./../../components/FormInput.vue */ "./resources/js/components/FormInput.vue");
+/* harmony import */ var _components_CustomForm_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./../../components/CustomForm.vue */ "./resources/js/components/CustomForm.vue");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+//
 //
 //
 //
@@ -3060,10 +3057,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    CustomForm: _components_CustomForm_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    FormInput: _components_FormInput_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    Modal: _components_Modal_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    CustomBtn: _components_CustomBtn_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+    CustomForm: _components_CustomForm_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+    FormInput: _components_FormInput_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+    Modal: _components_Modal_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    CustomBtn: _components_CustomBtn_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   data: function data() {
     return {
@@ -3093,11 +3090,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       });
     },
     formatDataTime: function formatDataTime() {
-      var atThisMoment = moment__WEBPACK_IMPORTED_MODULE_3___default()((0,moment__WEBPACK_IMPORTED_MODULE_3__.now)());
-      var until = moment__WEBPACK_IMPORTED_MODULE_3___default()(this.item.available_untill);
+      var atThisMoment = moment__WEBPACK_IMPORTED_MODULE_0___default()((0,moment__WEBPACK_IMPORTED_MODULE_0__.now)());
+      var until = moment__WEBPACK_IMPORTED_MODULE_0___default()(this.item.available_untill);
 
       if (atThisMoment.isBefore(until)) {
-        var _moment$duration = moment__WEBPACK_IMPORTED_MODULE_3___default().duration(until.diff(atThisMoment)),
+        var _moment$duration = moment__WEBPACK_IMPORTED_MODULE_0___default().duration(until.diff(atThisMoment)),
             _data = _moment$duration._data;
 
         var time = ""; //years Format
@@ -3167,24 +3164,15 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return "This bidding is closed";
       }
     },
-    bidNow: function bidNow() {// this.$fire({
-      //   title: "Success Bid",
-      //   text: "You have the maximum bid now, wait till win!",
-      //   type: "success",
-      //   timer: 300000,
-      // });
-    },
-    autoBid: function autoBid(_ref2) {
-      var data = _ref2.data;
-      this.item = data;
+    autoBid: function autoBid() {
       this.autoBiddingModal = false;
     },
     stopAutoBidding: function stopAutoBidding() {
       var _this2 = this;
 
       this.stopBtnLoading = true;
-      this.axios["delete"]("/api/auto-bid/".concat(this.id)).then(function (_ref3) {
-        var data = _ref3.data;
+      this.axios["delete"]("/api/auto-bid/".concat(this.id)).then(function (_ref2) {
+        var data = _ref2.data;
         _this2.item = data;
       })["finally"](function () {
         return _this2.stopBtnLoading = false;
@@ -3202,23 +3190,27 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         return _this3.formatDataTime();
       });
     }, 1000);
-    this.$echo["private"]("item-has-bid-".concat(this.$store.state.user.id)).listen("ItemWithBidsEvent", function (_ref4) {
-      var itemWithBid = _ref4.itemWithBid;
+    this.$echo["private"]("item-has-bid-".concat(this.$store.state.user.id)).listen("ItemWithBidsEvent", function (_ref3) {
+      var itemWithBid = _ref3.itemWithBid;
       _this3.hasAutoBid = true;
-      _this3.item = itemWithBid;
-    });
-    this.$echo.channel("update-item").listen("ItemEvent", function (_ref5) {
-      var item = _ref5.item;
 
-      if (_this3.id == item.id && !_this3.hasAutoBid) {
-        _this3.item = item;
+      _this3.$set(_this3, "item", itemWithBid);
+    }); // to stop code to not listen to the next event
+
+    if (this.hasAutoBid) {
+      this.hasAutoBid = false;
+      return;
+    }
+
+    this.$echo.channel("update-item").listen("ItemEvent", function (_ref4) {
+      var item = _ref4.item;
+      console.log("booooot");
+
+      if (_this3.id == item.id) {
+        _this3.$set(_this3, "item", item);
 
         _this3.$emit("clear-errors");
       }
-
-      _this3.$nextTick(function () {
-        return _this3.hasAutoBid = false;
-      });
     });
   }
 });
@@ -34193,7 +34185,7 @@ var staticRenderFns = [
       _c("div", { staticClass: "flex flex-col justify-center items-center" }, [
         _c("div", {
           staticClass:
-            "\n        animate-spin\n        rounded-full\n        h-16\n        w-16\n        border-t-2 border-b-2 border-purple-500\n      ",
+            "\n        h-16\n        w-16\n        animate-spin\n        rounded-full\n        border-t-2 border-b-2 border-purple-500\n      ",
         }),
       ]),
     ])
@@ -34764,7 +34756,6 @@ var render = function () {
                                       saveBtnClass:
                                         "w-full btn btn-primary mb-2",
                                     },
-                                    on: { success: _vm.bidNow },
                                     scopedSlots: _vm._u(
                                       [
                                         {
@@ -34973,6 +34964,7 @@ var render = function () {
                                               _c("FormInput", {
                                                 staticClass: "mb-4",
                                                 attrs: {
+                                                  isRequired: "",
                                                   iconText: "$",
                                                   type: "number",
                                                   label: "Maximun Bid Amount",
@@ -35005,6 +34997,10 @@ var render = function () {
                                                     "Bid Alert Notification",
                                                   placeholder:
                                                     "Bid Alert Notification",
+                                                  bindOptions: {
+                                                    min: 1,
+                                                    max: 100,
+                                                  },
                                                 },
                                                 model: {
                                                   value: fields.alert_when,
@@ -35025,7 +35021,7 @@ var render = function () {
                                       ],
                                       null,
                                       false,
-                                      2192740384
+                                      1081497110
                                     ),
                                   }),
                                 ]
@@ -35035,7 +35031,7 @@ var render = function () {
                           ],
                           null,
                           false,
-                          1039178404
+                          2549645780
                         ),
                       })
                     : _vm._e(),

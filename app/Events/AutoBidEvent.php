@@ -31,11 +31,14 @@ class AutoBidEvent implements ShouldBroadcast
 
     public function broadcastWith()
     {
+
+
         $autoBidWithItem = AutoBid::with('item:id,name')->find($this->autoBid->id);
 
         if ($this->message === 'canceled') {
             $this->autoBid->delete();
         }
+
         return ['autoBid' => $autoBidWithItem, 'message' => $this->message];
     }
     /**

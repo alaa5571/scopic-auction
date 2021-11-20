@@ -4,7 +4,6 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\DB;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,15 +24,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            // $items = new \App\Models\Item;
-            // $x = DB::table('select')->select('name')->get();
-            // event(new \App\Events\ItemEvent($x));
-            // for ($i = 0; $i < $items->count(); $i++) {
-            //     $items[$i]->name = 'Alaa';
-            //     $items[$i]->save();
-            // }
-        })->everyMinute();
 
         // $schedule->command('inspire')->everyMinute();
     }

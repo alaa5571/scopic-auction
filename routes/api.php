@@ -22,7 +22,7 @@ Route::get('auth/logout', 'Auth\LoginController@logout');
 Route::get('items', 'ItemController@index');
 Route::get('items/{item}', 'ItemController@show');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth:api'])->group(function () {
     Route::put('items/{item}', 'ItemController@update');
     Route::post('items/{item}/auto-bid', 'ItemController@autoBid');
     Route::delete('/auto-bid/{item}', 'AutoBidController@delete');

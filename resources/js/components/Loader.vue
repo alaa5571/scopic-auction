@@ -3,10 +3,10 @@
     <div class="flex flex-col justify-center items-center">
       <div
         class="
-          animate-spin
-          rounded-full
           h-16
           w-16
+          animate-spin
+          rounded-full
           border-t-2 border-b-2 border-purple-500
         "
       ></div>

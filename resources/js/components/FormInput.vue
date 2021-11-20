@@ -66,11 +66,11 @@ export default {
       required: true,
     },
     label: String,
-    value: [String, Number],
     iconText: String,
     placeholder: String,
     bindOptions: Object,
     isRequired: Boolean,
+    value: [String, Number],
   },
   computed: {
     id() {

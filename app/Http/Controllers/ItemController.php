@@ -41,27 +41,9 @@ class ItemController extends Controller
             $item->hasAutoBid = true;
             $item->max_auto_bid = $autoBids[0]->max_auto_bid;
         }
+
         return $item;
     }
-
-
-    public function checkCount($items)
-    {
-        return $items->count() > 0;
-    }
-
-    public function cancelAutoBid($autoBid)
-    {
-        event(new AutoBidEvent($autoBid, 'canceled'));
-    }
-
-    public function alertAutoBid($autoBid, $item)
-    {
-        if ($autoBid->alert_when && $item->max_bid > ($autoBid->alert_when / 100) * $autoBid->max_auto_bid) {
-            event(new AutoBidEvent($autoBid, 'warning'));
-        }
-    }
-
 
     /**
      * Update the specified resource in storage.
@@ -76,11 +58,13 @@ class ItemController extends Controller
 
         $request->validate(
             [
-                'max_bid' => 'required|integer|min:' . (int) ($item->max_bid + 1) . '|max:999999999',
+                'max_bid' => 'required|integer|min:' . (int) ($request->comeFromAutoBid ? $item->max_bid : $item->max_bid + 1) . '|max:999999999',
             ]
         );
 
+
         if ($item->available_untill && now() < $item->available_untill) {
+
             if ($item->user_id !== Auth::id()) {
                 // put auto biiding
                 $itemWithBids = Item::with(['autoBids' => function ($query) use ($item) {
@@ -88,42 +72,46 @@ class ItemController extends Controller
                 }])->find($item->id);
 
                 $autoBids =  $itemWithBids->autoBids;
-                $lastBid = $autoBids->count() - 1;
+                $length = $autoBids->count();
 
-                if ($this->checkCount($autoBids) && $lastBid === 0) {
+                if ($this->checkCount($autoBids) && $length === 1) {
                     $firstBid = $autoBids[0];
 
                     if ($request->max_bid < $firstBid->max_auto_bid) {
                         $item->max_bid = $request->max_bid + 1;
-                        $this->alertAutoBid($firstBid, $item);
+                        $item->user_id = $firstBid->user_id;
+
+                        if ($item->max_bid === $firstBid->max_auto_bid) {
+                            $this->cancelAutoBid($firstBid);
+                        } else {
+                            $this->alertAutoBid($firstBid, $item);
+                        }
                     } else {
                         $item->max_bid = $request->max_bid;
+                        $item->user_id = Auth::id();
+
                         $this->cancelAutoBid($firstBid);
                     }
-                } else if ($this->checkCount($autoBids) && $lastBid > 0 && $request->max_bid < $autoBids[$lastBid]->max_auto_bid) {
-
-                    $autoBidBrforeLast = $autoBids[$lastBid - 1]->max_auto_bid;
+                } else if ($this->checkCount($autoBids) && $length > 1 && $request->max_bid < $autoBids[$length - 1]->max_auto_bid) {
+                    $autoBidBrforeLast = $autoBids[$length - 2]->max_auto_bid;
 
                     if ($request->max_bid < $autoBidBrforeLast) {
                         $item->max_bid = $autoBidBrforeLast + 1;
-                        $this->alertAutoBid($autoBids[$lastBid], $item);
+                        $item->user_id = $autoBids[$length - 1]->user_id;
 
-                        for ($i = 0; $i < $lastBid - 1; $i++) {
-                            $this->cancelAutoBid($autoBids[$i]);
-                        }
+                        $this->alertAutoBid($autoBids[$length - 1], $item);
+                        $this->cancelManyAutoBid($length - 1, $autoBids);
                     } else {
                         $item->max_bid = $request->max_bid + 1;
-                        for ($i = 0; $i < $lastBid; $i++) {
-                            $this->cancelAutoBid($autoBids[$i]);
-                        }
+                        $item->user_id = Auth::id();
+
+                        $this->cancelManyAutoBid($length, $autoBids);
                     }
                 } else {
                     $item->max_bid = $request->max_bid;
                     $item->user_id = Auth::id();
 
-                    for ($i = 0; $i < $lastBid; $i++) {
-                        $this->cancelAutoBid($autoBids[$i]);
-                    }
+                    $this->cancelManyAutoBid($length, $autoBids);
                 }
 
                 $item->save();
@@ -131,6 +119,9 @@ class ItemController extends Controller
                 event(new ItemWithBidsEvent($item));
                 return  event(new ItemEvent($item));
             } else {
+                if ($request->comeFromAutoBid) {
+                    return event(new ItemWithBidsEvent($item));
+                }
                 return response()->json(['message' => "You have the maximum bid"], 422);
             }
         } else {
@@ -155,14 +146,34 @@ class ItemController extends Controller
             $autoBid->user_id = Auth::id();
             $autoBid->save();
 
-            $request->merge(['max_bid' => $item->max_bid + 1]);
-            $this->update($request, $item);
-
-            $item->hasAutoBid = true;
-            $item->max_auto_bid = $autoBid->max_auto_bid;
-            return $item;
+            $request->merge(['max_bid' => $item->max_bid, 'comeFromAutoBid' => true]);
+            return $this->update($request, $item);
         } else {
             return response()->json(['message' => "You Can't make auto bid on this item"], 422);
+        }
+    }
+
+    public function checkCount($items)
+    {
+        return $items->count() > 0;
+    }
+
+    public function cancelAutoBid($autoBid)
+    {
+        event(new AutoBidEvent($autoBid, 'canceled'));
+    }
+
+    public function alertAutoBid($autoBid, $item)
+    {
+        if ($autoBid->alert_when && $item->max_bid > ($autoBid->alert_when / 100) * $autoBid->max_auto_bid) {
+            event(new AutoBidEvent($autoBid, 'warning'));
+        }
+    }
+
+    public function cancelManyAutoBid($length, $autoBids)
+    {
+        for ($i = 0; $i < $length; $i++) {
+            $this->cancelAutoBid($autoBids[$i]);
         }
     }
 }
