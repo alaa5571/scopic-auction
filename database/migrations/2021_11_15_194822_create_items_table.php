@@ -21,7 +21,6 @@ class CreateItemsTable extends Migration
             $table->integer('max_bid')->nullable();
             $table->dateTime('available_untill');
             $table->bigInteger('user_id')->unsigned()->nullable();
-            $table->string('image');
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
         });
