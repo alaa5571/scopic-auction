@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-// use Illuminate\Support\Facades\Hash;
-use \App\Events\TestEvent;
+use Illuminate\Support\Facades\Auth;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -14,11 +14,6 @@ use \App\Events\TestEvent;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-
-// Route::post('hash', function () {
-//     return Hash::make('secret');
-// });
 
 Route::get('/{view?}', function () {
     return view('layout');

@@ -115,9 +115,6 @@ export default {
     logout() {
       this.$store.dispatch("logout");
     },
-    test() {
-      console.log("hho");
-    },
   },
   watch: {
     $route() {
@@ -129,8 +126,6 @@ export default {
     this.$echo
       .private(`notify-with-bid-${this.$store.state.user.id}`)
       .listen("AutoBidEvent", ({ autoBid, message }) => {
-        console.log(autoBid);
-
         let msg, type, title;
         if (message == "canceled") {
           type = "error";
@@ -139,7 +134,7 @@ export default {
                          this item ( ${autoBid.item.name} )
                       </span> 
                       has closed because you don't have enough balance <br />.
-                      Do you still want to make a bid?`;
+                      Do you want to visit it?`;
         } else {
           type = "warning";
           title = "Bid Reached Maximum Value";

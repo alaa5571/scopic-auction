@@ -20,7 +20,6 @@ class ItemFactory extends Factory
             'max_bid' => $this->faker->numberBetween($min = 51, $max = 100),
             'user_id' =>  $this->faker->randomElement($array = \App\Models\User::pluck('id')),
             'available_untill' => $this->faker->dateTimeBetween($startDate = 'now', $endDate = '5 days'),
-            'image' => 'https://wuzzufny-laravel-site.s3.us-east-2.amazonaws.com/images/logo.jpg',
             'created_at' => $this->faker->dateTimeBetween($startDate = '-30 days', $endDate = 'now'),
         ];
     }

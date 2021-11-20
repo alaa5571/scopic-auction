@@ -43,7 +43,6 @@
               <div v-if="!item.hasAutoBid">
                 <CustomForm
                   requestType="put"
-                  @success="bidNow"
                   :url="`/api/items/${id}`"
                   saveBtnText="Place A bid"
                   saveBtnClass="w-full btn btn-primary mb-2"
@@ -133,6 +132,7 @@
               >
                 <template #content="{ fields }">
                   <FormInput
+                    isRequired
                     iconText="$"
                     class="mb-4"
                     type="number"
@@ -148,6 +148,7 @@
                     v-model="fields.alert_when"
                     label="Bid Alert Notification"
                     placeholder="Bid Alert Notification"
+                    :bindOptions="{ min: 1, max: 100 }"
                   />
                 </template>
               </CustomForm>
@@ -160,12 +161,12 @@
 </template>
 
 <script>
-import CustomForm from "./../../components/CustomForm.vue";
-import FormInput from "./../../components/FormInput.vue";
-import Modal from "./../../components/Modal.vue";
-import moment, { now } from "moment";
 import { mapGetters } from "vuex";
+import moment, { now } from "moment";
+import Modal from "./../../components/Modal.vue";
 import CustomBtn from "../../components/CustomBtn.vue";
+import FormInput from "./../../components/FormInput.vue";
+import CustomForm from "./../../components/CustomForm.vue";
 
 export default {
   components: { CustomForm, FormInput, Modal, CustomBtn },
@@ -186,6 +187,7 @@ export default {
 
   computed: {
     ...mapGetters(["isLoggedIn"]),
+
     id() {
       return this.$route.params.id;
     },
@@ -198,6 +200,7 @@ export default {
         this.loader = false;
       });
     },
+
     formatDataTime() {
       let atThisMoment = moment(now());
       let until = moment(this.item.available_untill);
@@ -271,16 +274,8 @@ export default {
         return "This bidding is closed";
       }
     },
-    bidNow() {
-      // this.$fire({
-      //   title: "Success Bid",
-      //   text: "You have the maximum bid now, wait till win!",
-      //   type: "success",
-      //   timer: 300000,
-      // });
-    },
-    autoBid({ data }) {
-      this.item = data;
+
+    autoBid() {
       this.autoBiddingModal = false;
     },
 
@@ -308,15 +303,20 @@ export default {
       .private(`item-has-bid-${this.$store.state.user.id}`)
       .listen("ItemWithBidsEvent", ({ itemWithBid }) => {
         this.hasAutoBid = true;
-        this.item = itemWithBid;
+        this.$set(this, "item", itemWithBid);
       });
 
+    // to stop code to not listen to the next event
+    if (this.hasAutoBid) {
+      this.hasAutoBid = false;
+      return;
+    }
+
     this.$echo.channel("update-item").listen("ItemEvent", ({ item }) => {
-      if (this.id == item.id && !this.hasAutoBid) {
-        this.item = item;
+      if (this.id == item.id) {
+        this.$set(this, "item", item);
         this.$emit("clear-errors");
       }
-      this.$nextTick(() => (this.hasAutoBid = false));
     });
   },
 };
