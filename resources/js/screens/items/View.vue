@@ -313,7 +313,6 @@ export default {
     }
 
     this.$echo.channel("update-item").listen("ItemEvent", ({ item }) => {
-      console.log("booooot");
       if (this.id == item.id) {
         this.$set(this, "item", item);
         this.$emit("clear-errors");
