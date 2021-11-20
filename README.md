@@ -1,5 +1,6 @@
 # Scopic Auction 
 
+This app as an auction app to let users bid on items
 
 # Getting started
 
@@ -70,12 +71,41 @@ You can now access the server at http://localhost:8000
     php artisan serve
     npm run dev
 
-## Database seeding
-
-Run the database seeder and you're done
-
-    php artisan db:seed
-
 **_Note_** : It's recommended to have a clean database before seeding. You can refresh your migrations at any point to clean the database by running the following command
 
-    php artisan migrate:refresh
+    php artisan migrate:refresh --seed
+    
+### Tools
+
+* Javascript
+* VueJS 
+* Vuex
+* Vue Router (SPA)
+* Tailwind.CSS 
+* PHP 
+* OOP
+* Laravel
+* Pusher
+* Html
+* Css
+
+### How Does It work?
+
+* you can visit home page and item details page to see the items and the last bid's price before make login.
+* if you want to share in bidding you have to login first
+* there is a demo account is existing in the login form you can use it to login
+* as soon as you logged in you will redirect to home page
+* you can browse items and as soon as you click ( bid now ) you will navigate to item details page
+
+#### Item details page
+
+* you can see the item details like (name, description, available until, form to send your bidding through it and ...etc)
+* if the item is expired you'll get wanring message and you can't bid on it
+* otherwise you can put your bid as long as you don't have the maximum bid
+* if someone put a bid it will reflect on your page automatically (I'm using pusher and laravel Broadcast for real-time data)
+
+
+##### Auto Bid 
+* if you are the owner for the last bidding the auto bid will activate without increasing the current price otherwise it will
+* when your maximum value reached you'll get a notification to inform you
+* if your amount has finished the auto bid will close and you'll get notification with that.
