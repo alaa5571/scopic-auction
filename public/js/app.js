@@ -34431,7 +34431,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", [
       _c("img", {
-        staticStyle: { width: "80%", height: "80%" },
+        staticStyle: { width: "100%", height: "100%" },
         attrs: { src: "/assets/images/profile-icon.png" },
       }),
     ])
