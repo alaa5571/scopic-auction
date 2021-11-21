@@ -2,6 +2,8 @@
 
 This app as an auction app to let users bid on items
 
+* live site https://auction-uk.herokuapp.com
+
 # Getting started
 
 you have to install on your machine: PHP, Laravel, Composer and Node.js.
