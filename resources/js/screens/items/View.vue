@@ -306,13 +306,12 @@ export default {
         this.$set(this, "item", itemWithBid);
       });
 
-    // to stop code to not listen to the next event
-    if (this.hasAutoBid) {
-      this.hasAutoBid = false;
-      return;
-    }
-
     this.$echo.channel("update-item").listen("ItemEvent", ({ item }) => {
+      if (this.hasAutoBid) {
+        this.hasAutoBid = false;
+        return;
+      }
+
       if (this.id == item.id) {
         this.$set(this, "item", item);
         this.$emit("clear-errors");

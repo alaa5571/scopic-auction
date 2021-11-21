@@ -3195,16 +3195,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       _this3.hasAutoBid = true;
 
       _this3.$set(_this3, "item", itemWithBid);
-    }); // to stop code to not listen to the next event
-
-    if (this.hasAutoBid) {
-      this.hasAutoBid = false;
-      return;
-    }
-
+    });
     this.$echo.channel("update-item").listen("ItemEvent", function (_ref4) {
       var item = _ref4.item;
-      console.log("booooot");
+
+      if (_this3.hasAutoBid) {
+        _this3.hasAutoBid = false;
+        return;
+      }
 
       if (_this3.id == item.id) {
         _this3.$set(_this3, "item", item);
