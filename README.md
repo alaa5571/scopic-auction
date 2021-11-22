@@ -111,3 +111,11 @@ You can now access the server at http://localhost:8000
 * if you are the owner for the last bidding the auto bid will activate without increasing the current price otherwise it will
 * when your maximum value reached you'll get a notification to inform you
 * if your amount has finished the auto bid will close and you'll get notification with that.
+
+#### use other accounts to login with
+  ###### emails
+  * wprohaska@example.com
+  * xferry@example.com
+  * wprohaska@example.com
+  ###### Password 
+  * password
