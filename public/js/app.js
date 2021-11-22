@@ -3049,6 +3049,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -3066,6 +3076,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     return {
       item: {},
       loader: true,
+      hasReadMore: true,
       isClosed: false,
       stopBtnLoading: false,
       autoBidObj: {},
@@ -3177,6 +3188,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       })["finally"](function () {
         return _this2.stopBtnLoading = false;
       });
+    },
+    itemDetails: function itemDetails(desc) {
+      if (desc.length > 500) {
+        if (this.hasReadMore) {
+          return desc.slice(500);
+        }
+
+        return desc;
+      } else {
+        return desc;
+      }
     }
   },
   created: function created() {
@@ -34711,9 +34733,55 @@ var render = function () {
                       _c("span", { staticClass: "block font-semibold" }, [
                         _vm._v("Details"),
                       ]),
-                      _vm._v(
-                        "\n          " + _vm._s(_vm.item.details) + "\n        "
-                      ),
+                      _vm._v(" "),
+                      _c("span", [
+                        _vm._v(_vm._s(_vm.itemDetails(_vm.item.details))),
+                      ]),
+                      _vm._v(" "),
+                      _vm.item.details.length > 500
+                        ? _c("span", [
+                            _vm.hasReadMore
+                              ? _c("span", [_vm._v("... ")])
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _c(
+                              "span",
+                              {
+                                staticClass:
+                                  "text-purple-400 cursor-pointer ml-1 text-xs",
+                              },
+                              [
+                                _vm.hasReadMore
+                                  ? _c(
+                                      "span",
+                                      {
+                                        on: {
+                                          click: function ($event) {
+                                            _vm.hasReadMore = false
+                                          },
+                                        },
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                Read More\n              "
+                                        ),
+                                      ]
+                                    )
+                                  : _c(
+                                      "span",
+                                      {
+                                        on: {
+                                          click: function ($event) {
+                                            _vm.hasReadMore = true
+                                          },
+                                        },
+                                      },
+                                      [_vm._v("Read Less")]
+                                    ),
+                              ]
+                            ),
+                          ])
+                        : _vm._e(),
                     ]
                   ),
                   _vm._v(" "),

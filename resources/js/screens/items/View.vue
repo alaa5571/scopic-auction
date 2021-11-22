@@ -23,7 +23,17 @@
           <span class="block mb-4">Minimun bid {{ item.min_bid }}$</span>
           <p class="mb-6 font-thin leading-relaxed text-sm">
             <span class="block font-semibold">Details</span>
-            {{ item.details }}
+            <span>{{ itemDetails(item.details) }}</span>
+
+            <span v-if="item.details.length > 500">
+              <span v-if="hasReadMore">... </span>
+              <span class="text-purple-400 cursor-pointer ml-1 text-xs">
+                <span v-if="hasReadMore" @click="hasReadMore = false">
+                  Read More
+                </span>
+                <span v-else @click="hasReadMore = true">Read Less</span>
+              </span>
+            </span>
           </p>
 
           <div class="flex justify-between mb-6">
@@ -174,6 +184,7 @@ export default {
     return {
       item: {},
       loader: true,
+      hasReadMore: true,
 
       isClosed: false,
       stopBtnLoading: false,
@@ -287,6 +298,17 @@ export default {
           this.item = data;
         })
         .finally(() => (this.stopBtnLoading = false));
+    },
+
+    itemDetails(desc) {
+      if (desc.length > 500) {
+        if (this.hasReadMore) {
+          return desc.slice(500);
+        }
+        return desc;
+      } else {
+        return desc;
+      }
     },
   },
 
